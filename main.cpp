@@ -55,18 +55,14 @@ public:
             std::istringstream line_stream(line);
             line_stream >> literal;
 
+            // If literal has 2 or more occurrences or has its negative value at the same clause,
+            // first occurrence is written and others are ignored. That is why abs() is used
             while (literal) {
-                if (literals_in_use.find(literal) != literals_in_use.end()) {
-                    std::cout << "Two or more same literals in one clause" << std::endl;
-                    delete formula;
-                    return nullptr;
+                if (literals_in_use.find(abs(literal)) != literals_in_use.end()) {
+                    line_stream >> literal;
+                    continue;
                 }
-                if (literals_in_use.find(-literal) != literals_in_use.end()) {
-                    std::cout << "Literal and -literal in one clause" << std::endl;
-                    delete formula;
-                    return nullptr;
-                }
-                literals_in_use.insert(literal);
+                literals_in_use.insert(abs(literal));
                 clause.push_back(literal);
                 line_stream >> literal;
             }
