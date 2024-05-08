@@ -55,26 +55,31 @@ CNF::parse(const std::string &input) {
     return formula;
 }
 
-bool
-CNF::pure_literals_eliminate() {
-    unordered_set<int> pures = find_pure_literals();
-    if (pures.empty()) return false;
-
-    for (auto literal : pures) { // delete all clauses which contain pure literal
-        clauses.erase(std::remove_if(clauses.begin(), clauses.end(),
-                                     [literal](const unordered_set<int> &clause) {
-            return clause.find(literal) != clause.end();
-        }), clauses.end());
+void
+CNF::eliminate_literals(const unordered_set<int> &literals) {
+    for (auto literal : literals) {
+        auto to_be_removed = std::remove_if(clauses.begin(), clauses.end(),
+                                            [literal](const unordered_set<int> &clause) {
+                                                return clause.find(literal) != clause.end();
+        });
+        clauses_num -= clauses.end() - to_be_removed;
+        clauses.erase(to_be_removed, clauses.end());
     }
-
-    for (auto &clause : clauses) { // delete all "-literals" from formula
-        for (auto literal : pures) {
+    for (auto &clause : clauses) {
+        for (auto literal : literals) {
             auto reverse_polarity = clause.find(-literal);
             if (reverse_polarity != clause.end()) {
                 clause.erase(reverse_polarity);
             }
         }
     }
+}
+
+bool
+CNF::pure_literals_eliminate() {
+    unordered_set<int> pures = find_pure_literals();
+    if (pures.empty()) return false;
+    eliminate_literals(pures);
     return true;
 }
 
@@ -99,7 +104,21 @@ CNF::find_pure_literals() const {
     return pures;
 }
 
-//bool
-//CNF::unit_propagate() {
-//    unordered_set<int> unit
-//}
+bool
+CNF::unit_propagate() {
+    unordered_set<int> unit_clauses = find_unit_clauses();
+    if (unit_clauses.empty()) return false;
+    eliminate_literals(unit_clauses);
+    return true;
+}
+
+unordered_set<int>
+CNF::find_unit_clauses() const {
+    unordered_set<int> unit_clauses;
+    for (const auto &clause : clauses) {
+        if (clause.size() == 1) {
+            unit_clauses.insert(*clause.begin());
+        }
+    }
+    return unit_clauses;
+}
