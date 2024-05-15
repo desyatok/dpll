@@ -41,16 +41,23 @@ CNF::parse(const std::string &input) {
     for (size_t i = 0; i < formula->clauses_num; ++i) {
         int literal;
         unordered_set<int> clause;
+        bool meaningless_clause = false;
 
         std::getline(file,line);
         std::istringstream line_stream(line);
         line_stream >> literal;
 
         while (literal) {
+            if (clause.find(-literal) != clause.end()) { // if -literal and literal are in the same clause,
+                                                            // clause is not inserted into a formula
+                meaningless_clause = true;
+                formula->clauses_num--;
+                break;
+            }
             clause.insert(literal);
             line_stream >> literal;
         }
-        formula->clauses.push_back(clause);
+        if (!meaningless_clause) formula->clauses.push_back(clause);
     }
     return formula;
 }
@@ -121,4 +128,9 @@ CNF::find_unit_clauses() const {
         }
     }
     return unit_clauses;
+}
+
+int
+CNF::choose_literal() const {
+    return *clauses[0].begin();
 }

@@ -9,19 +9,22 @@ namespace sat_solver {
 
     class CNF {
     public:
-        CNF() = delete;
+        friend bool dpll(CNF *, std::vector<int> &);
         /// Parses DIMACS CNF formatted file, splitting clause into multiple lines is not supported
         static CNF *parse(const std::string &);
         bool unit_propagate();
         bool pure_literals_eliminate();
-        std::unordered_set<int> find_pure_literals() const;
-        std::unordered_set<int> find_unit_clauses() const;
+        [[nodiscard]] std::unordered_set<int> find_pure_literals() const;
+        [[nodiscard]] std::unordered_set<int> find_unit_clauses() const;
+        void model_print() const;
+        [[nodiscard]] int choose_literal() const;
     private:
-        CNF(int vars_num, int clauses_num) : vars_num(vars_num), clauses_num(clauses_num), clauses() {}
+        CNF(int vars_num, int clauses_num) : vars_num(vars_num), clauses_num(clauses_num) {}
         void eliminate_literals(const std::unordered_set<int> &);
         int vars_num; // is needed to check if num is small enough, then not being touched at all
         int clauses_num;
-        bool empty_cnf = false;
+        bool contains_empty_clause = false;
+        std::vector<int> model;
         std::vector<std::unordered_set<int>> clauses;
     };
 
