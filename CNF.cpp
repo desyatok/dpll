@@ -4,7 +4,10 @@
 #include <sstream>
 #include <algorithm>
 
-constexpr size_t MAX_VARS_NUMBER = 1500;
+constexpr auto MAX_VARS_NUMBER = 1500;
+constexpr auto tooManyVars = "Too many Variables are given";
+constexpr auto notDimacs = "Not a DIMACS CNF format";
+
 
 using namespace sat_solver;
 using std::vector;
@@ -14,6 +17,7 @@ using std::unordered_set;
 CNF *
 CNF::parse(const std::string &input) {
     std::ifstream file(input);
+    if (!file) throw std::runtime_error("Could not open a file");
     string line, tmp_line;
     CNF *formula;
 
@@ -25,17 +29,18 @@ CNF::parse(const std::string &input) {
             int vars_number, clauses_number;
 
             line_stream >> tmp_line >> tmp_line >> vars_number >> clauses_number;
+
+            if (vars_number < 1 || clauses_number < 1) throw std::invalid_argument(notDimacs);
+
             formula = new CNF(vars_number, clauses_number);
 
             if (formula->vars_num > MAX_VARS_NUMBER) {
-                std::cout << "Too many variables are given" << std::endl;
                 delete formula;
-                return nullptr;
+                throw std::invalid_argument(tooManyVars);
             }
             break;
         }
-        std::cout << "Unknown symbol for a DIMACS CNF format is detected" << std::endl;
-        return nullptr;
+        throw std::invalid_argument(notDimacs);
     }
 
     for (size_t i = 0; i < formula->clauses_num; ++i) {
@@ -46,6 +51,7 @@ CNF::parse(const std::string &input) {
         std::getline(file,line);
         std::istringstream line_stream(line);
         line_stream >> literal;
+        if (abs(literal) > formula->vars_num) throw std::invalid_argument(notDimacs);
 
         while (literal) {
             if (clause.find(-literal) != clause.end()) { // if -literal and literal are in the same clause,
@@ -56,6 +62,7 @@ CNF::parse(const std::string &input) {
             }
             clause.insert(literal);
             line_stream >> literal;
+            if (abs(literal) > formula->vars_num) throw std::invalid_argument(notDimacs);
         }
         if (!meaningless_clause) formula->clauses.push_back(clause);
     }
