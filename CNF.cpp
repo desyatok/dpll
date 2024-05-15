@@ -142,3 +142,21 @@ int
 CNF::choose_literal() const {
     return *clauses[0].begin();
 }
+
+void
+CNF::model_dimacs_output() {
+    if (model.size() != vars_num) {
+        std::cout << "s UNSATISFIABLE" << std::endl;
+    } else {
+        std::sort(model.begin(), model.end(), [](int num1, int num2){
+            return abs(num1) < abs(num2);
+        });
+
+        std::cout << "s UNSATISFIABLE" << std::endl << "v ";
+        for (int literal : model) {
+            std::cout << literal << ' ';
+        }
+
+        std::cout << "0" << std::endl;
+    }
+}

@@ -16,7 +16,7 @@ namespace sat_solver {
         bool pure_literals_eliminate();
         [[nodiscard]] std::unordered_set<int> find_pure_literals() const;
         [[nodiscard]] std::unordered_set<int> find_unit_clauses() const;
-        void model_print() const;
+        void model_dimacs_output();
         [[nodiscard]] int choose_literal() const;
     private:
         CNF(int vars_num, int clauses_num) : vars_num(vars_num), clauses_num(clauses_num) {}
