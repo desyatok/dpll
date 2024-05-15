@@ -19,6 +19,7 @@ CNF::parse(const std::string &input) {
     std::ifstream file(input);
     if (!file) throw std::runtime_error("Could not open a file");
     string line, tmp_line;
+    int vars_number, clauses_number;
     CNF *formula;
 
     while (true) {
@@ -26,7 +27,6 @@ CNF::parse(const std::string &input) {
         if (line[0] == 'c') continue;
         if (line[0] == 'p') {
             std::istringstream line_stream(line);
-            int vars_number, clauses_number;
 
             line_stream >> tmp_line >> tmp_line >> vars_number >> clauses_number;
 
@@ -43,7 +43,7 @@ CNF::parse(const std::string &input) {
         throw std::invalid_argument(notDimacs);
     }
 
-    for (size_t i = 0; i < formula->clauses_num; ++i) {
+    for (size_t i = 0; i < clauses_number; ++i) {
         int literal;
         unordered_set<int> clause;
         bool meaningless_clause = false;
@@ -98,7 +98,7 @@ bool
 CNF::pure_literals_eliminate() {
     unordered_set<int> pures = find_pure_literals();
     if (pures.empty()) return false;
-    model.insert(model.end(),pures.begin(), pures.end());
+    model.insert(pures.begin(), pures.end());
     eliminate_clauses_with_certain_literals(pures);
     return true;
 }
@@ -110,7 +110,7 @@ CNF::find_pure_literals() const {
 
     for (const auto &clause : clauses) {
         for (auto literal : clause) {
-            if (not_pures.find(abs(literal)) == not_pures.end()) continue;
+            if (not_pures.find(abs(literal)) != not_pures.end()) continue;
 
             auto reverse_polarity = pures.find(-literal);
             if (reverse_polarity != pures.end()) {
@@ -128,7 +128,7 @@ bool
 CNF::unit_propagate() {
     unordered_set<int> unit_clauses = find_unit_clauses();
     if (unit_clauses.empty()) return false;
-    model.insert(model.end(),unit_clauses.begin(), unit_clauses.end());
+    model.insert(unit_clauses.begin(), unit_clauses.end());
     eliminate_clauses_with_certain_literals(unit_clauses);
     eliminate_neg_literals_from_clauses(unit_clauses);
     return true;
@@ -148,22 +148,4 @@ CNF::find_unit_clauses() const {
 int
 CNF::choose_literal() const {
     return *clauses[0].begin();
-}
-
-void
-CNF::model_dimacs_output() {
-    if (model.size() != vars_num) {
-        std::cout << "s UNSATISFIABLE" << std::endl;
-    } else {
-        std::sort(model.begin(), model.end(), [](int num1, int num2){
-            return abs(num1) < abs(num2);
-        });
-
-        std::cout << "s UNSATISFIABLE" << std::endl << "v ";
-        for (int literal : model) {
-            std::cout << literal << ' ';
-        }
-
-        std::cout << "0" << std::endl;
-    }
 }

@@ -5,7 +5,8 @@
 
 namespace sat_solver {
 
-    bool dpll(CNF *, std::vector<int> &);
+    bool dpll_helper(CNF *);
+    void dpll(CNF *);
 
 } // sat_solver
 
