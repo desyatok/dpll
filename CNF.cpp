@@ -17,7 +17,7 @@ using std::unordered_set;
 CNF *
 CNF::parse(const std::string &input) {
     std::ifstream file(input);
-    if (!file) throw std::runtime_error("Could not open a file");
+    if (!file) throw std::runtime_error("Could not open a file\n");
     string line, tmp_line;
     int vars_number, clauses_number;
     CNF *formula;

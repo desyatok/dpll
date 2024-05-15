@@ -1,6 +1,4 @@
-#include <iostream>
-#include <memory>
-#include "DPLL.h"
+#include "CNF.h"
 
 using namespace sat_solver;
 int main()
