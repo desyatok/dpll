@@ -1,4 +1,4 @@
-#include "CNF.h"
+#include "DPLL.h"
 #include <iostream>
 #include <algorithm>
 
@@ -42,7 +42,7 @@ sat_solver::dpll_helper(CNF *formula) {
 void
 sat_solver::dpll(CNF *formula) {
     if (!dpll_helper(formula)) {
-        std::cout << "s UNSATISFIABLE\n";
+        std::cout << "s UNSATISFIABLE" << std::endl;
     } else {
         for (int literal = 1 ; literal <= formula->vars_num; ++literal) {
             auto literal_in_model = formula->model.find(literal) != formula->model.end() ||
@@ -55,7 +55,7 @@ sat_solver::dpll(CNF *formula) {
             return abs(num1) < abs(num2);
         });
 
-        std::cout << "s SATISFIABLE\nv ";
+        std::cout << "s SATISFIABLE" << std::endl << "v ";
         for (int literal : model) {
             std::cout << literal << ' ';
         }
