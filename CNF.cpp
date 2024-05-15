@@ -63,7 +63,7 @@ CNF::parse(const std::string &input) {
 }
 
 void
-CNF::eliminate_literals(const unordered_set<int> &literals) {
+CNF::eliminate_clauses_with_certain_literals(const std::unordered_set<int> &literals) {
     for (auto literal : literals) {
         auto to_be_removed = std::remove_if(clauses.begin(), clauses.end(),
                                             [literal](const unordered_set<int> &clause) {
@@ -72,11 +72,16 @@ CNF::eliminate_literals(const unordered_set<int> &literals) {
         clauses_num -= clauses.end() - to_be_removed;
         clauses.erase(to_be_removed, clauses.end());
     }
+}
+
+void
+CNF::eliminate_neg_literals_from_clauses(const std::unordered_set<int> &literals) {
     for (auto &clause : clauses) {
         for (auto literal : literals) {
             auto reverse_polarity = clause.find(-literal);
             if (reverse_polarity != clause.end()) {
                 clause.erase(reverse_polarity);
+                if (clause.empty()) contains_empty_clause = true;
             }
         }
     }
@@ -86,7 +91,8 @@ bool
 CNF::pure_literals_eliminate() {
     unordered_set<int> pures = find_pure_literals();
     if (pures.empty()) return false;
-    eliminate_literals(pures);
+    model.insert(model.end(),pures.begin(), pures.end());
+    eliminate_clauses_with_certain_literals(pures);
     return true;
 }
 
@@ -115,7 +121,9 @@ bool
 CNF::unit_propagate() {
     unordered_set<int> unit_clauses = find_unit_clauses();
     if (unit_clauses.empty()) return false;
-    eliminate_literals(unit_clauses);
+    model.insert(model.end(),unit_clauses.begin(), unit_clauses.end());
+    eliminate_clauses_with_certain_literals(unit_clauses);
+    eliminate_neg_literals_from_clauses(unit_clauses);
     return true;
 }
 

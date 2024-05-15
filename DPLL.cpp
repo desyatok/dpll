@@ -11,7 +11,7 @@ sat_solver::dpll(CNF *formula, std::vector<int> &model) {
     while (true) {
         bool units = formula->unit_propagate();
         bool pures = formula->pure_literals_eliminate();
-        if (!units && !pures) break; // no changes were made
+        if (!units && !pures || formula->contains_empty_clause) break; // no changes were made or empty clause appeared
     }
 
     int literal = formula->choose_literal();
