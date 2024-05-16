@@ -16,8 +16,8 @@ jobs:
     - name: Build
       run: |
         mkdir build
-        cmake -B build -DCMAKE_BUILD_TYPE=release -G Ninja
-        ninja -C build
+        cmake -B build -DCMAKE_BUILD_TYPE=release
+        make -C build
       env:
         CI: true
 
