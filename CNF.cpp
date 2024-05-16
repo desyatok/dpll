@@ -128,6 +128,14 @@ bool
 CNF::unit_propagate() {
     unordered_set<int> unit_clauses = find_unit_clauses();
     if (unit_clauses.empty()) return false;
+
+    for (auto literal : unit_clauses) {
+        if (unit_clauses.find(-literal) != unit_clauses.end()) {
+            contains_empty_clause = true;
+            return false;
+        }
+    }
+
     model.insert(unit_clauses.begin(), unit_clauses.end());
     eliminate_clauses_with_certain_literals(unit_clauses);
     eliminate_neg_literals_from_clauses(unit_clauses);
