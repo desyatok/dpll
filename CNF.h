@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_set>
 #include <set>
-
+#include <list>
 
 
 namespace sat_solver {
@@ -29,7 +29,7 @@ namespace sat_solver {
         int clauses_num;
         bool contains_empty_clause = false;
         std::unordered_set<int> model;
-        std::vector<std::unordered_set<int>> clauses;
+        std::list<std::unordered_set<int>> clauses;
     };
 
 } // sat_solver

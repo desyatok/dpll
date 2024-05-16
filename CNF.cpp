@@ -64,7 +64,7 @@ CNF::parse(const std::string &input) {
             line_stream >> literal;
             if (abs(literal) > formula->vars_num) throw std::invalid_argument(notDimacs);
         }
-        if (!meaningless_clause) formula->clauses.push_back(clause);
+        if (!meaningless_clause) formula->clauses.push_front(clause);
     }
     return formula;
 }
@@ -76,8 +76,8 @@ CNF::eliminate_clauses_with_certain_literals(const std::unordered_set<int> &lite
                                             [literal](const unordered_set<int> &clause) {
                                                 return clause.find(literal) != clause.end();
         });
-        clauses_num -= clauses.end() - to_be_removed;
         clauses.erase(to_be_removed, clauses.end());
+        clauses_num = clauses.size();
     }
 }
 
@@ -128,6 +128,14 @@ bool
 CNF::unit_propagate() {
     unordered_set<int> unit_clauses = find_unit_clauses();
     if (unit_clauses.empty()) return false;
+
+    for (auto literal : unit_clauses) {
+        if (unit_clauses.find(-literal) != unit_clauses.end()) {
+            contains_empty_clause = true;
+            return false;
+        }
+    }
+
     model.insert(unit_clauses.begin(), unit_clauses.end());
     eliminate_clauses_with_certain_literals(unit_clauses);
     eliminate_neg_literals_from_clauses(unit_clauses);
@@ -147,5 +155,5 @@ CNF::find_unit_clauses() const {
 
 int
 CNF::choose_literal() const {
-    return *clauses[0].begin();
+    return *clauses.begin()->begin();
 }
