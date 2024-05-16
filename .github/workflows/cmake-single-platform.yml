@@ -13,8 +13,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build
-
     - name: Build
-      run: cmake --build ${{github.workspace}}/build
+      run: |
+        mkdir build
+        cmake -B build -DCMAKE_BUILD_TYPE=release -G Ninja
+        ninja -C build
+      env:
+        CI: true
+
+    - name: Verifying
+      run: |
+        sudo apt install picosat
+        python3 test.py
+      env:
+        CI: true
+
