@@ -64,7 +64,7 @@ CNF::parse(const std::string &input) {
             line_stream >> literal;
             if (abs(literal) > formula->vars_num) throw std::invalid_argument(notDimacs);
         }
-        if (!meaningless_clause) formula->clauses.push_back(clause);
+        if (!meaningless_clause) formula->clauses.push_front(clause);
     }
     return formula;
 }
@@ -76,8 +76,8 @@ CNF::eliminate_clauses_with_certain_literals(const std::unordered_set<int> &lite
                                             [literal](const unordered_set<int> &clause) {
                                                 return clause.find(literal) != clause.end();
         });
-        clauses_num -= clauses.end() - to_be_removed;
         clauses.erase(to_be_removed, clauses.end());
+        clauses_num = clauses.size();
     }
 }
 
@@ -155,5 +155,5 @@ CNF::find_unit_clauses() const {
 
 int
 CNF::choose_literal() const {
-    return *clauses[0].begin();
+    return *clauses.begin()->begin();
 }

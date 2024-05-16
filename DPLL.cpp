@@ -22,7 +22,7 @@ sat_solver::dpll_helper(CNF *formula) {
 
     CNF *branch = new CNF(*formula);
     unordered_set<int> new_clause = {literal};
-    branch->clauses.push_back(new_clause);
+    branch->clauses.push_front(new_clause);
     ++branch->clauses_num;
 
     bool solve_with_literal = dpll_helper(branch);
@@ -35,7 +35,7 @@ sat_solver::dpll_helper(CNF *formula) {
     delete branch;
 
     unordered_set<int> new_clause_neg = {-literal};
-    formula->clauses.push_back(new_clause_neg);
+    formula->clauses.push_front(new_clause_neg);
     ++formula->clauses_num;
     return dpll_helper(formula);
 }
