@@ -64,7 +64,7 @@ def verify_single_cnf(file):
 
 
 test_data = 'test_data'
-solver_location = os.getcwd() + '/cmake-build-release/dpll'
+solver_location = os.getcwd() + '/build/dpll'
 
 for test in os.scandir(test_data):
     success = verify_single_cnf(test.path)
