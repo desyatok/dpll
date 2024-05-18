@@ -22,11 +22,10 @@ namespace sat_solver {
         [[nodiscard]] std::unordered_set<int> find_unit_clauses() const;
         [[nodiscard]] int choose_literal() const;
     private:
-        CNF(int vars_num, int clauses_num) : vars_num(vars_num), clauses_num(clauses_num) {}
+        explicit CNF(int vars_num) : vars_num(vars_num) {}
         void eliminate_clauses_with_certain_literals(const std::unordered_set<int> &);
         void eliminate_neg_literals_from_clauses(const std::unordered_set<int> &);
         int vars_num; // is needed to check if num is small enough, then not being touched at all
-        int clauses_num;
         bool contains_empty_clause = false;
         std::unordered_set<int> model;
         std::list<std::unordered_set<int>> clauses;

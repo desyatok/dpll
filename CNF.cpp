@@ -32,7 +32,7 @@ CNF::parse(const std::string &input) {
 
             if (vars_number < 1 || clauses_number < 1) throw std::invalid_argument(notDimacs);
 
-            formula = new CNF(vars_number, clauses_number);
+            formula = new CNF(vars_number);
 
             if (formula->vars_num > MAX_VARS_NUMBER) {
                 delete formula;
@@ -57,7 +57,6 @@ CNF::parse(const std::string &input) {
             if (clause.find(-literal) != clause.end()) { // if -literal and literal are in the same clause,
                                                             // clause is not inserted into a formula
                 meaningless_clause = true;
-                formula->clauses_num--;
                 break;
             }
             clause.insert(literal);
@@ -77,7 +76,6 @@ CNF::eliminate_clauses_with_certain_literals(const std::unordered_set<int> &lite
                                                 return clause.find(literal) != clause.end();
         });
         clauses.erase(to_be_removed, clauses.end());
-        clauses_num = clauses.size();
     }
 }
 
